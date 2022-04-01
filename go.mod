@@ -1,3 +1,3 @@
-module gen_code
+module bw
 
 go 1.16
