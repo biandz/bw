@@ -14,7 +14,10 @@ import (
 )
 
 func InitMysql(dsn string) *gorm.DB {
-
+	//dsn := fmt.Sprintf(
+	//	"%s:%s@tcp(%s:%s)/%s?timeout=90s&parseTime=true&loc=Local&collation"+
+	//		"=utf8mb4_general_ci", c.DbUserName, c.DbPassword, c.DbHost, c.DbPort, c.DbDatabase,
+	//)
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		Logger: logger.New(
 			Writer{},
