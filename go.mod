@@ -1,4 +1,4 @@
-module bw
+module github.com/biandz/bw
 
 go 1.16
 
