@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/go-redis/redis"
 	"github.com/sirupsen/logrus"
+	"os"
 	"time"
 )
 func InitRedis(redisHost,redisPort,redisPassword string) *redis.Client {
@@ -32,11 +33,27 @@ func InitRedis(redisHost,redisPort,redisPassword string) *redis.Client {
 		MinRetryBackoff: 8 * time.Millisecond,   //每次计算重试间隔时间的下限，默认8毫秒，-1表示取消间隔
 		MaxRetryBackoff: 512 * time.Millisecond, //每次计算重试间隔时间的上限，默认512毫秒，-1表示取消间隔
 	})
-	_, err := RClient.Ping().Result()
-	if err != nil {
-		panic(err)
-	} else {
-		logrus.Println("init redis ok")
-	}
+
+	go func() {
+		defer func() {
+			if re := recover();re!=nil{
+				logrus.Error("redis server is failed")
+				os.Exit(-1)
+			}
+		}()
+		flag := true
+		//启动心跳监听服务情况
+		for flag {
+			rst, err := RClient.Ping().Result()
+			if err != nil {
+				flag = false
+				panic(fmt.Sprintf("ping redis err:%s",err.Error()))
+			} else {
+				logrus.Println(fmt.Sprintf("ping redis result:%s",rst))
+			}
+			time.Sleep(1*time.Second)
+		}
+	}()
 	return RClient
+
 }
