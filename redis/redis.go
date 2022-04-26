@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/go-redis/redis"
 	"github.com/sirupsen/logrus"
-	"os"
 	"time"
 )
 func InitRedis(redisHost,redisPort,redisPassword string) *redis.Client {
@@ -35,19 +34,11 @@ func InitRedis(redisHost,redisPort,redisPassword string) *redis.Client {
 	})
 
 	go func() {
-		defer func() {
-			if re := recover();re!=nil{
-				logrus.Error("redis server is failed")
-				os.Exit(-1)
-			}
-		}()
-		flag := true
 		//启动心跳监听服务情况
-		for flag {
+		for  {
 			rst, err := RClient.Ping().Result()
 			if err != nil {
-				flag = false
-				panic(fmt.Sprintf("ping redis err:%s",err.Error()))
+				logrus.Error(fmt.Sprintf("ping redis err:%s",err.Error()))
 			} else {
 				logrus.Println(fmt.Sprintf("ping redis result:%s",rst))
 			}
