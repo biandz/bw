@@ -42,9 +42,10 @@ func InitMysql(dsn string) *gorm.DB {
 	if err != nil {
 		log.Fatal("数据库连接池初始化失败:", err.Error())
 	}
-	dbSql.SetMaxIdleConns(10)
-	dbSql.SetMaxOpenConns(100)
-	dbSql.SetConnMaxLifetime(time.Hour)
+	dbSql.SetMaxIdleConns(10)// 数据库连接数
+	dbSql.SetMaxOpenConns(100)// 连接池最大空闲连接数
+	dbSql.SetConnMaxIdleTime(time.Second * 30) // 连接池里的连接最大空闲时长，超时会被清理
+	dbSql.SetConnMaxLifetime(30*time.Second)   // 连接的最大时长
 	log.Println("数据库初始化成功")
 
 	return db
