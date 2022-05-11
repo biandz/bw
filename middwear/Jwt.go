@@ -1,9 +1,8 @@
 package middwear
 
 import (
+	"errors"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/gin-gonic/gin"
-	"net/http"
 	"time"
 )
 
@@ -39,20 +38,17 @@ func GenerateToken(claims *UserClaims) (bool,string,string) {
 }
 
 //验证token
-func JwtVerify(c *gin.Context) {
-	token := c.GetHeader("token")
+func JwtVerify(token string) error {
 	if token == "" {
-		c.Abort()
-		c.JSON(http.StatusOK,&Rsp{Code: 1,Msg: "token is not empty",Data: nil})
+		return errors.New("token is not empty")
 	}else{
 		//验证token，并存储在请求中
-		claims, ok, msg := parseToken(token)
+		_, ok, msg := parseToken(token)
 		if !ok{
-			c.Abort()
-			c.JSON(http.StatusOK,&Rsp{Code: 1,Msg: msg,Data: nil})
+			return errors.New(msg)
 		}
-		c.Set("userInfo", claims.User)
 	}
+	return nil
 }
 
 // 解析Token
